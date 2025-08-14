@@ -237,25 +237,11 @@
 
                     <div id="financial-indicators-section" class="mt-10 border-t pt-8">
                         <h3 class="text-xl font-bold text-center mb-6">Indicadores Financeiros</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="grid grid-cols-1 gap-8">
                             <div class="text-center">
-                                <h4 class="text-lg font-semibold text-gray-800 mb-4">Custo para o Mutuário (CET)</h4>
-                                <p class="text-gray-600 mb-4 text-sm">Custo total da operação para quem toma o empréstimo, considerando o valor líquido recebido vs. parcelas pagas.</p>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="bg-purple-50 p-4 rounded-lg">
-                                        <p class="text-sm text-purple-800">CET a.m.</p>
-                                        <p id="cetMonthly" class="text-2xl font-bold text-purple-900">0,00%</p>
-                                    </div>
-                                    <div class="bg-purple-50 p-4 rounded-lg">
-                                        <p class="text-sm text-purple-800">CET a.a.</p>
-                                        <p id="cetAnnual" class="text-2xl font-bold text-purple-900">0,00%</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <h4 class="text-lg font-semibold text-gray-800 mb-4">Rentabilidade para o Concessor (TIR)</h4>
-                                <p class="text-gray-600 mb-4 text-sm">Retorno da operação, considerando o valor bruto desembolsado vs. as parcelas recebidas (descontada a taxa de adm.).</p>
-                                <div class="grid grid-cols-2 gap-4">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-4">Rentabilidade da Operação (TIR)</h4>
+                                <p class="text-gray-600 mb-4 text-sm">Retorno da operação, descontada a taxa de adm.</p>
+                                <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
                                     <div class="bg-indigo-50 p-4 rounded-lg">
                                         <p class="text-sm text-indigo-800">TIR a.m.</p>
                                         <p id="lenderTirMonthly" class="text-2xl font-bold text-indigo-900">0,00%</p>
@@ -264,6 +250,14 @@
                                         <p class="text-sm text-indigo-800">TIR a.a.</p>
                                         <p id="lenderTirAnnual" class="text-2xl font-bold text-indigo-900">0,00%</p>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="text-center mt-8">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-4">Encargos</h4>
+                                <p class="text-gray-600 mb-4 text-sm max-w-md mx-auto">Percentual do total de encargos sobre o valor bruto do contrato.</p>
+                                <div class="bg-teal-50 p-4 rounded-lg max-w-xs mx-auto">
+                                    <p class="text-sm text-teal-800">% Encargos / Valor Bruto</p>
+                                    <p id="contractCostPercent" class="text-3xl font-bold text-teal-900">0,00%</p>
                                 </div>
                             </div>
                         </div>
@@ -422,10 +416,15 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr class="font-bold">
+                            <td>Valor Financiado</td>
+                            <td id="cetDetailFinancedAmount"></td>
+                            <td>100,00%</td>
+                        </tr>
                         <tr>
-                            <td>Valor do Crédito (Líquido Liberado)</td>
+                            <td>(=) Valor do Crédito (Líquido Liberado)</td>
                             <td id="cetDetailNetAmount"></td>
-                            <td>-</td>
+                            <td id="cetDetailNetAmountPercent"></td>
                         </tr>
                         <tr class="bg-gray-100">
                             <td colspan="3" class="font-bold text-left">Encargos Inclusos no CET:</td>
@@ -464,11 +463,6 @@
                             <td>(=) Valor Total a Pagar</td>
                             <td id="cetDetailTotalPayable"></td>
                             <td>-</td>
-                        </tr>
-                        <tr class="bg-blue-100 font-bold text-blue-800">
-                            <td>Custo Efetivo Total (CET)</td>
-                            <td id="cetDetailCetMonthly"></td>
-                            <td id="cetDetailCetAnnual"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -533,11 +527,10 @@
         const totalInflationValueEl = document.getElementById('totalInflationValue');
         const totalAdminFeeValueEl = document.getElementById('totalAdminFeeValue');
         const totalMaintenanceFeesEl = document.getElementById('totalMaintenanceFees');
-
-        const cetMonthlyEl = document.getElementById('cetMonthly'); 
-        const cetAnnualEl = document.getElementById('cetAnnual');   
+  
         const lenderTirMonthlyEl = document.getElementById('lenderTirMonthly');
         const lenderTirAnnualEl = document.getElementById('lenderTirAnnual');
+        const contractCostPercentEl = document.getElementById('contractCostPercent');
 
         const amortizationTableBody = document.getElementById('amortizationTableBody');
         const tabButtons = document.querySelectorAll('.tab-button');
@@ -789,13 +782,14 @@
 
             const monthlyCET = (numMonths > 0 && grossAmount > 0) ? calculateIRR(borrowerCashFlows, 0.005) : 0;
             const annualCET = Math.pow(1 + monthlyCET, 12) - 1;
-            cetMonthlyEl.textContent = formatPercent(monthlyCET);
-            cetAnnualEl.textContent = formatPercent(annualCET);
             
             const monthlyLenderTIR = (numMonths > 0 && grossAmount > 0) ? calculateIRR(lenderCashFlows, 0.005) : 0;
             const annualLenderTIR = Math.pow(1 + monthlyLenderTIR, 12) - 1;
             lenderTirMonthlyEl.textContent = formatPercent(monthlyLenderTIR);
             lenderTirAnnualEl.textContent = formatPercent(annualLenderTIR);
+
+            const contractCostPercentage = (grossAmount > 0) ? totalAllFees / grossAmount : 0;
+            contractCostPercentEl.textContent = formatPercent(contractCostPercentage);
 
             simulationData = {
                 grossAmount: formatCurrency(grossAmount),
@@ -843,7 +837,9 @@
             document.getElementById('ccbQqmRate').textContent = formatPercent(rates.qqm, 4);
 
             // Populate CET Details
+            document.getElementById('cetDetailFinancedAmount').textContent = formatCurrency(raw.grossAmount);
             document.getElementById('cetDetailNetAmount').textContent = formatCurrency(raw.desiredNetAmount);
+            document.getElementById('cetDetailNetAmountPercent').textContent = percentOfFinanced(raw.desiredNetAmount);
             document.getElementById('cetDetailInterest').textContent = formatCurrency(raw.totalJuros);
             document.getElementById('cetDetailInterestPercent').textContent = percentOfFinanced(raw.totalJuros);
             document.getElementById('cetDetailInflation').textContent = formatCurrency(raw.totalCorrecao);
@@ -857,9 +853,7 @@
             document.getElementById('cetDetailQqm').textContent = formatCurrency(raw.qqmValue);
             document.getElementById('cetDetailQqmPercent').textContent = percentOfFinanced(raw.qqmValue);
             document.getElementById('cetDetailTotalPayable').textContent = simulationData.totalPayable;
-            document.getElementById('cetDetailCetMonthly').textContent = `${simulationData.cetMonthly} a.m.`;
-            document.getElementById('cetDetailCetAnnual').textContent = `${simulationData.cetAnnual} a.a.`;
-
+            
             mainContent.classList.add('hidden');
             ccbSection.classList.remove('hidden');
             window.scrollTo(0, 0);
