@@ -116,7 +116,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 bg-gray-50 rounded-lg border">
                     <div>
                         <label for="interestRateInput" class="block text-sm font-medium text-gray-700">Taxa de Juros (a.a. %)</label>
-                        <input type="number" id="interestRateInput" value="4.71" step="0.01" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                        <input type="number" id="interestRateInput" value="5.21" step="0.01" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
                     </div>
                     <div>
                         <label for="adminRateInput" class="block text-sm font-medium text-gray-700">Taxa de Administração (a.a. %)</label>
@@ -312,17 +312,17 @@
                 <div id="tab-content" class="prose max-w-none">
                     <div id="origination-content" class="tab-pane">
                         <h3 class="font-bold text-lg mb-2">Taxa de Aprovação de Crédito (TAC)</h3>
-                        <p class="mb-4">Este encargo financeiro é cobrado no momento da concessão, repactuação ou novação do crédito. Sua finalidade é cobrir os custos administrativos e operacionais associados à análise, aprovação e formalização do Contrato de Empréstimo. O valor corresponde a 0,5% sobre o montante total do contrato. É uma cobrança única, realizada no início da operação.</p>
+                        <p class="mb-4">Este encargo financeiro é cobrado no momento da concessão, repactuação ou novação do crédito. Sua finalidade é cobrir os custos administrativos e operacionais associados à análise, aprovação e formalização do Contrato de Empréstimo. O valor corresponde a 1% sobre o montante total do contrato. É uma cobrança única, realizada no início da operação.</p>
                         
                         <h3 class="font-bold text-lg mb-2">Taxa de Risco (QQM - Quota de Quitação por Morte)</h3>
-                        <p class="mb-4">A Taxa de Risco é um encargo destinado à constituição de um Fundo de Quitação por Morte (FQM), que garante a liquidação integral do saldo devedor do empréstimo em caso de falecimento do mutuário. Este encargo é cobrado em parcela única no momento da concessão do crédito. As alíquotas são variáveis, dependendo da faixa etária do mutuário e do prazo de amortização do empréstimo.</p>
+                        <p class="mb-4">A Taxa de Risco é um encargo destinado à constituição de um Fundo de Quitação por Morte (FQM), que garante a liquidação integral do saldo devedor do empréstimo em caso de falecimento do mutuário. Este encargo é cobrado em parcela única no momento da concessão do crédito. As alíquotas são variáveis, dependendo da faixa etária do mutuário e do prazo de amortização do empréstimo. Adicionalmente, é cobrada uma taxa fixa de R$ 100,00 para cobrir custos operacionais do fundo.</p>
 
                         <h3 class="font-bold text-lg mb-2">IOF (Imposto sobre Operações Financeiras)</h3>
                         <p>O IOF é um tributo federal incidente sobre operações de crédito. No contexto dos empréstimos da PORTUS, é aplicado sobre o valor total contratado, conforme a legislação vigente. Sua alíquota e metodologia de cálculo são definidas pela Receita Federal do Brasil.</p>
                     </div>
                     <div id="maintenance-content" class="tab-pane hidden">
                         <h3 class="font-bold text-lg mb-2">Taxa de Juros Real</h3>
-                        <p class="mb-4">Representa o principal componente de remuneração do capital emprestado. A taxa nominal é de 4,71% ao ano, aplicada mensalmente sobre o saldo devedor. A definição desta taxa considera a Meta Atuarial dos planos de benefícios (INPC + 4,71%), acrescida de 0,48% para cobrir eventuais inadimplências e flutuações de mercado, configurando um custo fixo para o mutuário durante a amortização.</p>
+                        <p class="mb-4">Representa o principal componente de remuneração do capital emprestado. A taxa nominal é de 5,21% ao ano, aplicada mensalmente sobre o saldo devedor. A definição desta taxa considera a Meta Atuarial dos planos de benefícios (INPC + 4,71%), acrescida de 0,48% para cobrir eventuais inadimplências e flutuações de mercado, configurando um custo fixo para o mutuário durante a amortização.</p>
 
                         <h3 class="font-bold text-lg mb-2">Atualização Monetária</h3>
                         <p class="mb-4">Tem como objetivo preservar o poder de compra do capital emprestado, corrigindo o saldo devedor pela inflação. A PORTUS utiliza o Índice Nacional de Preços ao Consumidor (INPC) como indexador, com uma defasagem de dois meses. Para fins de simulação, é utilizada a meta de inflação de 5% ao ano. A adoção do INPC visa assegurar consistência com a meta atuarial dos planos de benefícios.</p>
@@ -562,7 +562,7 @@
             [0.005797, null, null, null, null, null]
         ];
         const actualMonths = [1, 6, 12, 18, 24, 30, 36, 42, 48, 54, 60]; 
-        const tacRate = 0.005;
+        const tacRate = 0.01; // Alterado para 1%
         const iofAdditionalRate = 0.0038;
         const iofDailyRate = 0.000082;
         
@@ -700,12 +700,12 @@
             const totalIofRate = iofAdditionalRate + (iofDailyRate * loanDays);
 
             const denominator = (1 - tacRate - totalIofRate) * (1 - currentQqmPercent);
-            const grossAmount = (denominator > 0) ? desiredNetAmount / denominator : 0;
+            const grossAmount = (denominator > 0) ? (desiredNetAmount + 100) / denominator : 0;
             
             const tacValue = grossAmount * tacRate;
             const iofValue = grossAmount * totalIofRate;
             const baseAmountForQqm = grossAmount - tacValue - iofValue;
-            const qqmValue = baseAmountForQqm * currentQqmPercent;
+            const qqmValue = (baseAmountForQqm * currentQqmPercent) + 100;
             const totalOriginationFees = tacValue + qqmValue + iofValue;
             
             grossAmountEl.textContent = formatCurrency(grossAmount);
