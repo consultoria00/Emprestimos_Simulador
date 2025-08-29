@@ -181,16 +181,16 @@
                         <h4 class="text-lg font-semibold text-gray-800 mb-4 text-center md:text-left">Encargos de Originação</h4>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
                             <div class="bg-blue-50 p-4 rounded-lg">
-                                <p class="text-sm text-blue-800">Taxa de Aprovação - TAC <span id="tacPercent" class="font-bold text-blue-900 text-xs"></span></p>
+                                <p class="text-sm text-blue-800">Taxa de Aprovação - TAC</p>
                                 <p id="tacValue" class="text-2xl font-bold text-blue-900">R$ 0,00</p>
                             </div>
                             <div class="bg-purple-50 p-4 rounded-lg">
-                                <p class="text-sm text-purple-800">Taxa de Risco - QQM <span id="qqmPercent" class="font-bold text-purple-900 text-xs"></span></p>
+                                <p class="text-sm text-purple-800">Taxa de Risco - QQM</p>
                                 <p id="qqmValue" class="text-2xl font-bold text-purple-900">R$ 0,00</p>
                                 <p id="qqmEligibilityMessage" class="text-xs text-red-600 mt-1 hidden">Não Elegível</p>
                             </div>
                             <div class="bg-indigo-50 p-4 rounded-lg">
-                                <p class="text-sm text-indigo-800">IOF <span id="iofPercent" class="font-bold text-indigo-900 text-xs"></span></p>
+                                <p class="text-sm text-indigo-800">IOF</p>
                                 <p id="iofValue" class="text-2xl font-bold text-indigo-900">R$ 0,00</p>
                             </div>
                              <div class="bg-orange-50 p-4 rounded-lg">
@@ -237,7 +237,21 @@
 
                     <div id="financial-indicators-section" class="mt-10 border-t pt-8">
                         <h3 class="text-xl font-bold text-center mb-6">Indicadores Financeiros</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div class="text-center">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-4">Custo Efetivo Total (CET)</h4>
+                                <p class="text-gray-600 mb-4 text-sm">Custo total da operação para o mutuário.</p>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="bg-purple-50 p-4 rounded-lg">
+                                        <p class="text-sm text-purple-800">CET a.m.</p>
+                                        <p id="cetMonthly" class="text-2xl font-bold text-purple-900">0,00%</p>
+                                    </div>
+                                    <div class="bg-purple-50 p-4 rounded-lg">
+                                        <p class="text-sm text-purple-800">CET a.a.</p>
+                                        <p id="cetAnnual" class="text-2xl font-bold text-purple-900">0,00%</p>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="text-center">
                                 <h4 class="text-lg font-semibold text-gray-800 mb-4">Rentabilidade da Operação (TIR)</h4>
                                 <p class="text-gray-600 mb-4 text-sm">Retorno da operação, descontada a taxa de adm.</p>
@@ -254,7 +268,7 @@
                             </div>
                             <div class="text-center">
                                 <h4 class="text-lg font-semibold text-gray-800 mb-4">Encargos</h4>
-                                <p class="text-gray-600 mb-4 text-sm">Percentual dos encargos sobre o valor bruto do contrato.</p>
+                                <p class="text-gray-600 mb-4 text-sm">Percentual dos encargos sobre o valor bruto.</p>
                                 <div class="bg-teal-50 p-4 rounded-lg max-w-[15rem] mx-auto">
                                     <p class="text-sm text-teal-800">% Encargos / Valor Bruto</p>
                                     <p id="contractCostPercent" class="text-2xl font-bold text-teal-900">0,00%</p>
@@ -464,6 +478,11 @@
                             <td id="cetDetailTotalPayable"></td>
                             <td>-</td>
                         </tr>
+                        <tr class="bg-blue-100 font-bold text-blue-800">
+                            <td>Custo Efetivo Total (CET)</td>
+                            <td id="cetDetailCetMonthly"></td>
+                            <td id="cetDetailCetAnnual"></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -517,16 +536,6 @@
         const grossAmountEl = document.getElementById('grossAmountEl');
         const summaryNetAmountEl = document.getElementById('summaryNetAmountEl');
         const totalAllFeesValueEl = document.getElementById('totalAllFeesValue');
-
-        const tacPercentEl = document.getElementById('tacPercent');
-        const qqmPercentEl = document.getElementById('qqmPercent');
-        const iofPercentEl = document.getElementById('iofPercent');
-        const qqmEligibilityMessageEl = document.getElementById('qqmEligibilityMessage'); 
-
-        const totalInterestValueEl = document.getElementById('totalInterestValue');
-        const totalInflationValueEl = document.getElementById('totalInflationValue');
-        const totalAdminFeeValueEl = document.getElementById('totalAdminFeeValue');
-        const totalMaintenanceFeesEl = document.getElementById('totalMaintenanceFees');
   
         const lenderTirMonthlyEl = document.getElementById('lenderTirMonthly');
         const lenderTirAnnualEl = document.getElementById('lenderTirAnnual');
@@ -540,6 +549,13 @@
         const ccbSection = document.getElementById('ccb-section');
         const contractButton = document.getElementById('contractButton');
         const backToSimulatorButton = document.getElementById('backToSimulatorButton');
+        const qqmEligibilityMessageEl = document.getElementById('qqmEligibilityMessage');
+        const totalInterestValueEl = document.getElementById('totalInterestValue');
+        const totalInflationValueEl = document.getElementById('totalInflationValue');
+        const totalAdminFeeValueEl = document.getElementById('totalAdminFeeValue');
+        const totalMaintenanceFeesEl = document.getElementById('totalMaintenanceFees');
+        const cetMonthlyEl = document.getElementById('cetMonthly');
+        const cetAnnualEl = document.getElementById('cetAnnual');
 
         let simulationData = {};
 
@@ -699,13 +715,12 @@
             const loanDays = Math.min(numMonths * 30, 365);
             const totalIofRate = iofAdditionalRate + (iofDailyRate * loanDays);
 
-            const denominator = (1 - tacRate - totalIofRate) * (1 - currentQqmPercent);
+            const denominator = (1 - tacRate - totalIofRate - currentQqmPercent);
             const grossAmount = (denominator > 0) ? (desiredNetAmount + 100) / denominator : 0;
             
             const tacValue = grossAmount * tacRate;
             const iofValue = grossAmount * totalIofRate;
-            const baseAmountForQqm = grossAmount - tacValue - iofValue;
-            const qqmValue = (baseAmountForQqm * currentQqmPercent) + 100;
+            const qqmValue = (grossAmount * currentQqmPercent) + 100;
             const totalOriginationFees = tacValue + qqmValue + iofValue;
             
             grossAmountEl.textContent = formatCurrency(grossAmount);
@@ -714,10 +729,6 @@
             qqmValueEl.textContent = formatCurrency(qqmValue); 
             iofValueEl.textContent = formatCurrency(iofValue); 
             totalOriginationFeesEl.textContent = formatCurrency(totalOriginationFees); 
-
-            tacPercentEl.textContent = `(${formatPercent(tacRate)})`;
-            qqmPercentEl.textContent = `(${formatPercent(currentQqmPercent)})`;
-            iofPercentEl.textContent = `(${formatPercent(totalIofRate)})`;
 
             amortizationTableBody.innerHTML = ''; 
             
@@ -780,6 +791,11 @@
             
             updateChartData({ tac: tacValue, qqm: qqmValue, iof: iofValue, interest: totalJuros, inflation: totalCorrecao, admin: totalAdmin });
             
+            const monthlyCET = (numMonths > 0 && grossAmount > 0) ? calculateIRR(borrowerCashFlows, 0.005) : 0;
+            const annualCET = Math.pow(1 + monthlyCET, 12) - 1;
+            cetMonthlyEl.textContent = formatPercent(monthlyCET);
+            cetAnnualEl.textContent = formatPercent(annualCET);
+
             const monthlyLenderTIR = (numMonths > 0 && grossAmount > 0) ? calculateIRR(lenderCashFlows, 0.005) : 0;
             const annualLenderTIR = Math.pow(1 + monthlyLenderTIR, 12) - 1;
             lenderTirMonthlyEl.textContent = formatPercent(monthlyLenderTIR);
@@ -794,6 +810,8 @@
                 loanTerm: `${numMonths} meses`,
                 ageRange: ageRangeText,
                 firstInstallment: formatCurrency(firstInstallmentValue),
+                cetAnnual: formatPercent(annualCET),
+                cetMonthly: formatPercent(monthlyCET),
                 totalPayable: formatCurrency(totalPayable),
                 rates: {
                     interestAnnual: annualInterestPercent / 100,
@@ -813,7 +831,7 @@
 
         // --- CCB GENERATION ---
         function generateCCB() {
-            const { raw, rates } = simulationData;
+            const { raw, rates, cetMonthly, cetAnnual } = simulationData;
             const percentOfFinanced = (value) => raw.grossAmount > 0 ? formatPercent(value / raw.grossAmount, 2) : formatPercent(0, 2);
 
             document.getElementById('ccbContractNumber').textContent = Date.now();
@@ -848,6 +866,8 @@
             document.getElementById('cetDetailQqm').textContent = formatCurrency(raw.qqmValue);
             document.getElementById('cetDetailQqmPercent').textContent = percentOfFinanced(raw.qqmValue);
             document.getElementById('cetDetailTotalPayable').textContent = simulationData.totalPayable;
+            document.getElementById('cetDetailCetMonthly').textContent = `${cetMonthly} a.m.`;
+            document.getElementById('cetDetailCetAnnual').textContent = `${cetAnnual} a.a.`;
             
             mainContent.classList.add('hidden');
             ccbSection.classList.remove('hidden');
@@ -896,3 +916,4 @@
     </script>
 </body>
 </html>
+
